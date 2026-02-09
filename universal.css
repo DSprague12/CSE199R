@@ -1,0 +1,31 @@
+body{
+    overflow: hidden;
+    padding: 0px;
+    margin: 0px;
+}
+nav ul{
+    padding: 0px;
+    margin:0px;
+}
+nav ul li{
+    display: inline;
+    background-color: antiquewhite;
+    padding:20px;
+    margin: 0px;
+    text-align: center;
+    justify-content: center;
+}
+#drawingCanvas{
+    overflow: hidden;
+    touch-action: none;
+}
+#characterDisplay{
+    position: absolute;
+    z-index: 10;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 300px;
+    opacity: 0.1;
+    pointer-events: none;
+}
