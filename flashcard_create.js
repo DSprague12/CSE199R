@@ -1,39 +1,85 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('flashcardForm');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
 
+    let fileDataUrl = null;
+    let flashcards = [];
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const character = document.getElementById('newCharacter').value;
-        const pinyin = document.getElementById('newPinyin').value;
-    })
-
-        const fs = require('fs');
-const filePath = './yourfile.json';
-
-try {
-    // 1. Read the file
-    const data = fs.readFileSync(filePath, 'utf8');
-
-    // 2. Parse the JSON string into a JavaScript object
-    const jsonObject = JSON.parse(data);
-
-    // 3. Modify the object (example: update a property)
-    jsonObject.someKey = "newValue";
-    // Example: add to an array
-    if (jsonObject.someArray) {
-        jsonObject.someArray.push("newItem");
+    function loadFlashcards() {
+        const stored = localStorage.getItem('flashcards');
+        if (stored) {
+            try {
+                flashcards = JSON.parse(stored);
+                return Promise.resolve(flashcards);
+            } catch (e) {
+                console.error('Invalid flashcards in localStorage, clearing', e);
+                localStorage.removeItem('flashcards');
+            }
+        }
+        return fetch('flashcards.json')
+            .then(r => r.json())
+            .then(data => {
+                flashcards = data.flashcards || [];
+                return flashcards;
+            })
+            .catch(() => {
+                flashcards = [];
+                return flashcards;
+            });
     }
 
-    // 4. Convert the object back into a JSON string (using 2 for pretty-printing)
-    const updatedJsonString = JSON.stringify(jsonObject, null, 2);
+    loadFlashcards();
 
-    // 5. Write the updated data back to the file
-    fs.writeFileSync(filePath, updatedJsonString, 'utf8');
-    console.log('JSON file updated successfully.');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (!f) {
+                fileDataUrl = null;
+                if (preview) preview.style.display = 'none';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                fileDataUrl = reader.result;
+                if (preview && f.type.startsWith('image')) {
+                    preview.src = fileDataUrl;
+                    preview.style.display = 'block';
+                }
+            };
+            reader.readAsDataURL(f);
+        });
+    }
 
-} catch (error) {
-    console.error('Error modifying JSON file:', error);
-}
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const character = document.getElementById('newCharacter').value.trim();
+        const pinyin = document.getElementById('newPinyin').value.trim();
+        if (!character) {
+            alert('Please enter a character');
+            return;
+        }
+
+        const newCard = { character, pinyin, media: fileDataUrl || null };
+
+        await loadFlashcards();
+        flashcards.push(newCard);
+        localStorage.setItem('flashcards', JSON.stringify(flashcards));
+
+        // Notify other scripts/pages in this window about the update
+        try {
+            window.dispatchEvent(new CustomEvent('flashcardsUpdated', { detail: flashcards }));
+        } catch (e) {
+            console.warn('Could not dispatch flashcardsUpdated event', e);
+        }
+
+        alert('Flashcard added to local set');
+        form.reset();
+        fileDataUrl = null;
+        if (preview) {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    });
 
 });

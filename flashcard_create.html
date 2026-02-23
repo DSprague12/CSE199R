@@ -11,6 +11,8 @@
     <script src="flashcard_create.js"></script>
 
     <form id = "flashcardForm">
+        <input type="file" id="fileInput" accept="image/*,audio/*">
+        <img id="preview" alt="preview" style="max-width:200px;display:block;margin:8px 0;">
         <input type="text" id="newCharacter" placeholder="Enter Character">
         <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition">
         <button id="addFlashcard" type="submit">Add Flashcard</button>

@@ -8,14 +8,27 @@
 </head>
 <body>
     <script src="universal.js"></script>
-    
+    <script src="flashcard_create.js"></script>
     <script src="drawing.js"></script>
-    <canvas id="drawingCanvas"></canvas>
-    <p id = "characterDisplay"></p>
-    <p id = "pinyinDisplay"></p>
-    <button id="clearCanvas" onclick="clearCanvas()">Clear Canvas</button>
-    <button id="toggleCharacter" onclick="toggleCharacter()">Toggle Character</button>
-    <button id="nextCharacter" onclick="nextCharacter()">Next Character</button>
-
+    <main>
+        <h1>Practice Drawing Characters</h1>
+        <canvas id="drawingCanvas"></canvas>
+        <p id = "characterDisplay"></p>
+        <p id = "pinyinDisplay"></p>
+        <div class = 'box'>
+            <button id="clearCanvas" onclick="clearCanvas()">Clear Canvas</button>
+            <button id="toggleCharacter" onclick="toggleCharacter()">Toggle Character</button>
+            <button id="nextCharacter" onclick="nextCharacter()">Next Character</button>
+        </div>
+        <div class="box">
+            <a id="downloadFlashcards" href="flashcards.json" download>Download Flashcard File</a>
+            <input type="file" id="uploadFlashcards" accept=".json">
+        </div>
+        <form id = "flashcardForm" class = 'box'>
+            <input type="text" id="newCharacter" placeholder="Enter Character">
+            <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition">
+            <button id="addFlashcard" type="submit">Add Flashcard</button>
+        </form>
+    </main>
 </body>
 </html>
