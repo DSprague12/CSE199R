@@ -4,32 +4,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const preview = document.getElementById('preview');
 
     let fileDataUrl = null;
-    let flashcards = [];
+
+    function normalizeCard(card) {
+        const now = new Date().toISOString();
+        return {
+            id: card.id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            character: (card.character || '').trim(),
+            pinyin: (card.pinyin || '').trim(),
+            tags: Array.isArray(card.tags) ? card.tags.map(t => t.trim()).filter(Boolean) : String(card.tags || '').split(',').map(t => t.trim()).filter(Boolean),
+            starred: Boolean(card.starred),
+            media: card.media || '',
+            createdAt: card.createdAt || now,
+            lastReviewedAt: card.lastReviewedAt || null,
+            dueAt: card.dueAt || now,
+            correctCount: Number.isFinite(card.correctCount) ? card.correctCount : 0,
+            wrongCount: Number.isFinite(card.wrongCount) ? card.wrongCount : 0,
+            streak: Number.isFinite(card.streak) ? card.streak : 0,
+            reviewHistory: Array.isArray(card.reviewHistory) ? card.reviewHistory : []
+        };
+    }
 
     function loadFlashcards() {
         const stored = localStorage.getItem('flashcards');
         if (stored) {
             try {
-                flashcards = JSON.parse(stored);
-                return Promise.resolve(flashcards);
+                const cards = JSON.parse(stored);
+                if (!Array.isArray(cards)) throw new Error('Flashcards not array');
+                return cards.map(normalizeCard);
             } catch (e) {
                 console.error('Invalid flashcards in localStorage, clearing', e);
                 localStorage.removeItem('flashcards');
             }
         }
+
         return fetch('flashcards.json')
             .then(r => r.json())
             .then(data => {
-                flashcards = data.flashcards || [];
-                return flashcards;
+                const cards = data.flashcards || [];
+                return cards.map(normalizeCard);
             })
-            .catch(() => {
-                flashcards = [];
-                return flashcards;
-            });
+            .catch(() => []);
     }
 
-    loadFlashcards();
+    function saveFlashcards(cards) {
+        localStorage.setItem('flashcards', JSON.stringify(cards));
+        window.dispatchEvent(new CustomEvent('flashcardsUpdated', { detail: cards }));
+    }
 
     if (fileInput) {
         fileInput.addEventListener('change', (e) => {
@@ -55,26 +75,25 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const character = document.getElementById('newCharacter').value.trim();
         const pinyin = document.getElementById('newPinyin').value.trim();
-        if (!character) {
-            alert('Please enter a character');
+        const tags = document.getElementById('newTags').value.trim();
+        const starred = document.getElementById('newStarred').checked;
+
+        if (!character || !pinyin) {
+            alert('Please enter both character and pinyin');
             return;
         }
 
-        const newCard = { character, pinyin };
-        if (fileDataUrl) {
-            newCard.media = fileDataUrl;
-        }
+        const newCard = normalizeCard({
+            character,
+            pinyin,
+            tags,
+            starred,
+            media: fileDataUrl || ''
+        });
 
-        await loadFlashcards();
+        const flashcards = await loadFlashcards();
         flashcards.push(newCard);
-        localStorage.setItem('flashcards', JSON.stringify(flashcards));
-
-        // Notify other scripts/pages in this window about the update
-        try {
-            window.dispatchEvent(new CustomEvent('flashcardsUpdated', { detail: flashcards }));
-        } catch (e) {
-            console.warn('Could not dispatch flashcardsUpdated event', e);
-        }
+        saveFlashcards(flashcards);
 
         alert('Flashcard added to local set');
         form.reset();
@@ -84,5 +103,4 @@ document.addEventListener('DOMContentLoaded', () => {
             preview.style.display = 'none';
         }
     });
-
 });

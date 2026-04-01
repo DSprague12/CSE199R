@@ -37,16 +37,56 @@
             <input type="file" id="fileInput" accept="image/*">
             <img id="preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none; max-width:160px; margin-top:0.5em;" alt="Image preview">
         </div>
-        <form id = "flashcardForm" class = 'box'>
-            <input type="text" id="newCharacter" placeholder="Enter Character">
-            <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition">
+        <form id="flashcardForm" class="box" style="flex-wrap: wrap;">
+            <input type="text" id="newCharacter" placeholder="Enter Character" required>
+            <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition" required>
+            <input type="text" id="newTags" placeholder="Tags (comma-separated)">
+            <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="newStarred"> Starred</label>
             <button id="addFlashcard" type="submit">Add Flashcard</button>
         </form>
 
-        <h2>Browse Cards</h2>
-        <ul id="flashcardList">
-            
-        </ul>
+        <h2>Study & Edit Cards</h2>
+        <div class="box" style="justify-content: space-between; align-items: center;">
+            <input type="text" id="searchInput" placeholder="Search character or pinyin" style="flex:2; min-width: 180px;">
+            <select id="filterSelect" style="flex:1; min-width: 160px;">
+                <option value="all">All cards</option>
+                <option value="due">Due for review</option>
+                <option value="missed">Missed recently</option>
+                <option value="starred">Starred</option>
+                <option value="recent">Recently added</option>
+            </select>
+            <input type="text" id="tagFilter" placeholder="Filter by tag" style="flex:1; min-width: 130px;">
+            <button id="clearFilter">Clear</button>
+        </div>
+        <div class="box" style="flex-wrap: wrap; gap: 10px;">
+            <button id="exportJson">Export JSON</button>
+            <input type="file" id="importJson" accept="application/json" style="flex:1; min-width: 150px;">
+            <button id="exportCsv">Export CSV</button>
+            <input type="file" id="importCsv" accept=".csv" style="flex:1; min-width: 150px;">
+            <button id="themeToggle">Toggle Dark Mode</button>
+        </div>
+
+        <div id="reviewPanel" class="box" style="flex-wrap: wrap;">
+            <button id="markEasy">Mark Easy</button>
+            <button id="markHard">Mark Hard</button>
+            <button id="markMissed">Mark Missed</button>
+            <span id="stats" style="flex:1; min-width: 150px;"></span>
+        </div>
+
+        <div id="cardEditor" class="box" style="flex-wrap: wrap; border: 1px solid #2f9c95; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+            <input type="hidden" id="editCardId">
+            <input type="text" id="editCharacter" placeholder="Edit Character" style="flex:1; min-width:130px;">
+            <input type="text" id="editPinyin" placeholder="Edit Pinyin/Definition" style="flex:2; min-width:130px;">
+            <input type="text" id="editTags" placeholder="Edit tags (comma-separated)" style="flex:1; min-width:130px;">
+            <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="editStarred"> Starred</label>
+            <button id="saveCard">Save card</button>
+            <button id="deleteCard">Delete card</button>
+        </div>
+
+        <h3>Local deck cards</h3>
+        <ul id="flashcardList"></ul>
+        <h3>Prebuilt loadable decks</h3>
+        <ul id="deckLoadList"></ul>
     </main>
 </body>
 </html>

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const list = document.getElementById('flashcardList');
+    const list = document.getElementById('deckLoadList');
 
     // Array of flashcard file paths to display
     const flashcardFiles = [
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear existing content
     list.innerHTML = '';
 
-    // Create buttons and download links for each flashcard file
+    // Create buttons for each flashcard file
     flashcardFiles.forEach(file => {
         const li = document.createElement('li');
         const container = document.createElement('div');
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.gap = '10px';
         container.style.alignItems = 'center';
 
-        // Load button
         const loadButton = document.createElement('button');
         loadButton.textContent = 'Load';
         loadButton.onclick = () => loadFlashcardSet(file.path);

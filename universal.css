@@ -158,3 +158,51 @@ p {
     text-align: center;
     padding: 10px;
 }
+
+body.dark-mode {
+    background-color: #1b1b1b;
+    color: #ddd;
+}
+
+body.dark-mode nav ul li,
+body.dark-mode .box,
+body.dark-mode #flashcardList li,
+body.dark-mode #deckLoadList li {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #eee;
+}
+
+body.dark-mode .box button,
+body.dark-mode a,
+body.dark-mode #downloadFlashcards {
+    border-color: #66d6d0;
+    color: #66d6d0;
+}
+
+body.dark-mode .box button:hover,
+body.dark-mode #downloadFlashcards:hover {
+    background-color: #346e6a;
+}
+
+@media (max-width: 768px) {
+    .box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    .box button,
+    #downloadFlashcards,
+    #uploadFlashcards,
+    #flashcardForm input {
+        min-width: 100%;
+    }
+
+    #drawingCanvas {
+        height: 40vh;
+    }
+}
