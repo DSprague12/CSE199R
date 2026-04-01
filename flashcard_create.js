@@ -60,7 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const newCard = { character, pinyin, media: fileDataUrl || null };
+        const newCard = { character, pinyin };
+        if (fileDataUrl) {
+            newCard.media = fileDataUrl;
+        }
 
         await loadFlashcards();
         flashcards.push(newCard);

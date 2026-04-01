@@ -10,25 +10,43 @@
     <script src="universal.js"></script>
     <script src="flashcard_create.js"></script>
     <script src="drawing.js"></script>
+    <script src="browse.js"></script>
     <main>
         <h1>Practice Drawing Characters</h1>
-        <canvas id="drawingCanvas"></canvas>
+        <div id="container">
+            <canvas id="drawingCanvas"></canvas>
+        </div>
         <p id = "characterDisplay"></p>
         <p id = "pinyinDisplay"></p>
+        <p id = "cardCount" style="font-size: 0.9rem; color: #555;"></p>
+        <div class='box'>
+            <img id="mediaDisplay" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none; max-width:160px; margin-top:0.5em;" alt="Card media">
+        </div>
         <div class = 'box'>
             <button id="clearCanvas" onclick="clearCanvas()">Clear Canvas</button>
             <button id="toggleCharacter" onclick="toggleCharacter()">Toggle Character</button>
             <button id="nextCharacter" onclick="nextCharacter()">Next Character</button>
+            <label for="strokeWidthRange">Stroke Width: <span id="strokeWidthValue">10</span>px</label>
+            <input type="range" id="strokeWidthRange" min="1" max="50" value="10">
         </div>
         <div class="box">
-            <a id="downloadFlashcards" href="flashcards.json" download>Download Flashcard File</a>
+            <a id="downloadFlashcards" href="flashcards/flashcards.json" download>Download Flashcard File</a>
             <input type="file" id="uploadFlashcards" accept=".json">
+        </div>
+        <div class="box">
+            <input type="file" id="fileInput" accept="image/*">
+            <img id="preview" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none; max-width:160px; margin-top:0.5em;" alt="Image preview">
         </div>
         <form id = "flashcardForm" class = 'box'>
             <input type="text" id="newCharacter" placeholder="Enter Character">
             <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition">
             <button id="addFlashcard" type="submit">Add Flashcard</button>
         </form>
+
+        <h2>Browse Cards</h2>
+        <ul id="flashcardList">
+            
+        </ul>
     </main>
 </body>
 </html>

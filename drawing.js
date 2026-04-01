@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
     const display = document.getElementById('characterDisplay');
     const pinyinDisplay = document.getElementById('pinyinDisplay');
+    const container = document.getElementById('container');
+
+    let dpr;
 
     let showCharacter = false;
     let characterIndex = 0;
@@ -18,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         pinyinDisplay.textContent = flashcards[characterIndex].pinyin || '';
+        const cardCount = document.getElementById('cardCount');
+        if (cardCount) {
+            cardCount.textContent = `Card ${characterIndex + 1} of ${flashcards.length}`;
+        }
         const card = flashcards[characterIndex];
         if (mediaDisplay) {
             if (card && card.media && typeof card.media === 'string' && card.media.startsWith('data:')) {
@@ -27,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 mediaDisplay.src = '';
                 mediaDisplay.style.display = 'none';
             }
+        }
+
+        if (showCharacter && flashcards[characterIndex]) {
+            display.textContent = flashcards[characterIndex].character || '';
+        } else {
+            display.textContent = '';
         }
 
         // update download link
@@ -116,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function resizeCanvas() {
-        const dpr = window.devicePixelRatio || 1;
-        const width = window.innerWidth*0.8;
+        dpr = window.devicePixelRatio || 1;
+        const width = container.clientWidth;
         const height = window.innerHeight*0.5;
 
         canvas.width = width * dpr;
@@ -130,6 +143,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+
+    let brushRadius = 10;
+    const STEP_DISTANCE = 4; 
+
+    function updateBrushWidthDisplay() {
+        const strokeWidthValue = document.getElementById('strokeWidthValue');
+        if (strokeWidthValue) {
+            strokeWidthValue.textContent = String(brushRadius);
+        }
+    }
+
+    const strokeWidthRange = document.getElementById('strokeWidthRange');
+    if (strokeWidthRange) {
+        strokeWidthRange.addEventListener('input', (e) => {
+            const value = Number(e.target.value);
+            if (!Number.isNaN(value) && value > 0) {
+                brushRadius = value;
+                updateBrushWidthDisplay();
+            }
+        });
+    }
+
+    updateBrushWidthDisplay();
 
     let drawing = false;
     let mouse = { x: 0, y: 0 };
@@ -161,10 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('pointerup', pointerUp);
     canvas.addEventListener('pointerleave', pointerUp);
 
-    const BRUSH_RADIUS = 10;
-    const STEP_DISTANCE = 4; 
-
-
     function drawStroke() {
         const dx = mouse.x - prev.x;
         const dy = mouse.y - prev.y;
@@ -179,8 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= steps; i++) {
             const x = prev.x + (dx * i) / steps;
             const y = prev.y + (dy * i) / steps;
-            ctx.moveTo(x + BRUSH_RADIUS, y);
-            ctx.ellipse(x, y, BRUSH_RADIUS, BRUSH_RADIUS, 0, 0, Math.PI * 2);
+            ctx.arc(x, y, brushRadius, 0, Math.PI * 2);
         }
 
         ctx.fill();
@@ -209,7 +240,14 @@ document.addEventListener('DOMContentLoaded', () => {
             display.textContent = "";
         } else {
             showCharacter = true;
-            display.textContent = flashcards[characterIndex].character || "";
+            const text = flashcards[characterIndex].character || "";
+            display.textContent = text;
+            // Scale font size based on text length for better fit
+            const length = text.length;
+            const baseSize = 400;
+            const minSize = 30;
+            const size = Math.max(minSize, baseSize / Math.sqrt(length));
+            display.style.fontSize = size + 'px';
         }
     }
 
@@ -223,5 +261,23 @@ document.addEventListener('DOMContentLoaded', () => {
         showCharacter = false;
         updateUI();
     }
+
+    window.addEventListener('keydown', (event) => {
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+        switch (event.key.toLowerCase()) {
+            case 'n':
+                nextCharacter();
+                event.preventDefault();
+                break;
+            case 't':
+                toggleCharacter();
+                event.preventDefault();
+                break;
+            case 'c':
+                clearCanvas();
+                event.preventDefault();
+                break;
+        }
+    });
 
 });
