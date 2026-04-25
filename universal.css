@@ -1,97 +1,133 @@
-
 * {
     box-sizing: border-box;
 }
 
-body{
-    padding: 0px;
-    margin: 0px;
-    background-color: #e2efde;
-    font-family: 'Arial', sans-serif;
+:root {
+    --bg: #edf4f0;
+    --bg-accent: radial-gradient(circle at 10% 0%, #ffffff 0%, rgba(255, 255, 255, 0.7) 28%, transparent 60%),
+        linear-gradient(165deg, #edf4f0 0%, #d7e6db 55%, #c9ddd0 100%);
+    --panel: rgba(255, 255, 255, 0.82);
+    --text: #12302c;
+    --muted: #496660;
+    --brand: #0c7f77;
+    --brand-strong: #086159;
+    --border: #9cc5be;
+    --soft-border: #c7ddd7;
+    --active-row: rgba(12, 127, 119, 0.12);
+    --shadow: 0 12px 40px rgba(18, 48, 44, 0.1);
 }
-main{
-    padding: clamp(10px, 5vw, 100px);
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-accent);
+    color: var(--text);
+    font-family: "Avenir Next", "Segoe UI", "Noto Sans SC", sans-serif;
 }
-a{
-    color: #2f9c95;
-    font-size: clamp(1em, 2vw, 1.2em);
+
+main {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: clamp(14px, 4vw, 42px);
 }
-ul a{
-    text-decoration: none;
-    font-size: clamp(1.5em, 4vw, 2em);
-    text-align: center;
+
+h1,
+h2,
+h3 {
+    margin: 0 0 10px;
+    line-height: 1.2;
 }
-nav ul{
-    padding: 0px;
-    margin:0px;
-    text-align: center;
-    justify-content: center;
-    display: flex;
-    flex-wrap: wrap;
+
+h1 {
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
 }
-nav ul li{
-    color:#2f9c95;
-    display: flex;
-    background-color: #e2efde;
-    padding: clamp(10px, 2vw, 20px);
-    margin: 0px;
-    text-align: center;
-    justify-content: center;
+
+h2 {
+    font-size: clamp(1.3rem, 2vw, 1.9rem);
+    color: var(--brand-strong);
 }
-.box{
-    width:100%;
-    height: auto;
-    min-height: 50px;
-    display: flex;
-    gap: 10px;
-    margin: 10px 0;
-    flex-wrap: wrap;
+
+h3 {
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
 }
-.box button{
-    text-align: center;
-    border: #2f9c95 solid 2px;
-    color:#2f9c95;
-    border-radius: 5px;
-    background-color: #e2efde;
-    flex: 1;
-    min-width: 100px;
-    font-size: clamp(1em, 2vw, 2em);
+
+a {
+    color: var(--brand);
+}
+
+code {
+    background: rgba(12, 127, 119, 0.11);
+    border-radius: 4px;
+    padding: 0 5px;
+}
+
+nav ul {
     padding: 10px;
-    cursor: pointer;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    justify-content: center;
 }
-.box button:hover {
-    background-color: #d0e8cb;
+
+nav ul li {
+    border: 1px solid var(--soft-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    padding: 8px 16px;
 }
-#drawingCanvas{
-    overflow: hidden;
-    touch-action: none;
-    border:#2f9c95 solid 2px;
-    width:100%;
-    height: auto;
-    display: block;
-    z-index: 0;
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--soft-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: clamp(14px, 2.5vw, 22px);
+    margin: 14px 0;
+    backdrop-filter: blur(6px);
 }
-.download-link{
-    display: inline-block;
-    padding: 10px 20px;
-    border: #2f9c95 solid 2px;
-    border-radius: 5px;
-    background-color: #e2efde;
-    text-decoration: none;
-    color: #2f9c95;
+
+.hero-panel {
+    border-left: 6px solid var(--brand);
 }
-#container{
-    z-index: 1;
+
+.subtitle {
+    margin: 8px 0;
+    color: var(--muted);
+}
+
+.shortcut-hint {
+    margin: 0;
+    color: var(--muted);
+}
+
+#container {
     width: 100%;
     position: relative;
+    overflow: hidden;
+    border-radius: 10px;
 }
-#characterDisplay{
+
+#drawingCanvas {
+    touch-action: none;
+    border: 2px solid var(--brand);
+    border-radius: 10px;
+    width: 100%;
+    display: block;
+    background: #ffffff;
+}
+
+#characterDisplay {
     position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 10;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 0 8px;
+    height: 100%;
     font-size: clamp(80px, 30vmin, 400px);
+    line-height: 1;
     opacity: 0.1;
     pointer-events: none;
     width: 100%;
@@ -103,52 +139,6 @@ nav ul li{
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-#flashcardForm{
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-#flashcardForm input{
-    flex: 1;
-    min-width: 200px;
-    min-height: 50px;
-    font-size: clamp(1em, 2vw, 1.2em);
-    padding: 10px;
-}
-#flashcardForm button {
-    flex: 1;
-    min-width: 100px;
-}
-
-h1 {
-    font-size: clamp(1.5em, 5vw, 2.5em);
-}
-
-p {
-    font-size: clamp(1em, 2vw, 1.2em);
-}
-
-#uploadFlashcards {
-    flex: 1;
-    min-width: 150px;
-    padding: 10px;
-    cursor: pointer;
-}
-
-#downloadFlashcards {
-    display: inline-block;
-    padding: 10px 20px;
-    border: #2f9c95 solid 2px;
-    border-radius: 5px;
-    background-color: #e2efde;
-    text-decoration: none;
-    flex: 1;
-    text-align: center;
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 #pinyinDisplay {
     white-space: pre-wrap;
@@ -156,53 +146,242 @@ p {
     overflow-wrap: break-word;
     max-width: 100%;
     text-align: center;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    margin: 12px 0 6px;
+}
+
+.meta-line {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+.media-box {
+    min-height: 26px;
+    margin-bottom: 8px;
+}
+
+#mediaDisplay,
+#preview {
+    max-width: 180px;
+    border-radius: 8px;
+    border: 1px solid var(--soft-border);
+    display: none;
+}
+
+.box {
+    width: 100%;
+    min-height: 50px;
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+button,
+input,
+select,
+.file-label {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--text);
+    font-size: 1rem;
+    padding: 10px 12px;
+}
+
+button,
+.file-label {
+    cursor: pointer;
+}
+
+.box button,
+#downloadFlashcards,
+.file-label {
+    border: 1px solid var(--brand);
+    color: var(--brand);
+    background: rgba(12, 127, 119, 0.05);
+    text-align: center;
+    min-height: 44px;
+}
+
+.box button:hover,
+#downloadFlashcards:hover,
+.file-label:hover {
+    background: rgba(12, 127, 119, 0.12);
+}
+
+input:focus,
+select:focus,
+button:focus,
+.file-label:focus {
+    outline: 2px solid rgba(12, 127, 119, 0.35);
+    outline-offset: 1px;
+}
+
+input[type="file"] {
+    flex: 1;
+    min-width: 170px;
+}
+
+#flashcardForm input[type="text"],
+#cardEditor input[type="text"],
+#searchInput,
+#tagFilter,
+#filterSelect {
+    flex: 1;
+    min-width: 160px;
+}
+
+.check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+}
+
+#downloadFlashcards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    text-decoration: none;
+}
+
+.controls-row button {
+    flex: 1;
+    min-width: 135px;
+}
+
+.stroke-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+#strokeWidthRange {
+    flex: 1;
+    min-width: 160px;
+}
+
+.compact-box button {
+    flex: 1;
+    min-width: 120px;
+}
+
+.filter-row {
+    align-items: center;
+}
+
+#stats {
+    flex: 2;
+    min-width: 280px;
+    color: var(--muted);
+    align-self: center;
+}
+
+.editor-row {
+    border: 1px solid var(--brand);
+    border-radius: 10px;
     padding: 10px;
 }
 
+#flashcardList,
+#deckLoadList {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    border: 1px solid var(--soft-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+#flashcardList li,
+#deckLoadList li {
+    padding: 10px;
+    border-bottom: 1px solid var(--soft-border);
+}
+
+#flashcardList li:last-child,
+#deckLoadList li:last-child {
+    border-bottom: none;
+}
+
+#flashcardList li.is-active {
+    background: var(--active-row);
+}
+
+#flashcardList li .card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+#flashcardList li .card-text {
+    margin-right: 12px;
+}
+
+#flashcardList li .card-actions button {
+    flex: unset;
+    min-width: 72px;
+    font-size: 0.9rem;
+    padding: 7px 8px;
+}
+
 body.dark-mode {
-    background-color: #1b1b1b;
-    color: #ddd;
+    --bg: #111a18;
+    --bg-accent: radial-gradient(circle at 0% 0%, rgba(36, 65, 61, 0.75) 0%, transparent 35%),
+        linear-gradient(170deg, #111a18 0%, #162422 55%, #1c2f2c 100%);
+    --panel: rgba(18, 30, 28, 0.88);
+    --text: #e0efec;
+    --muted: #a4c2bd;
+    --brand: #64d3c6;
+    --brand-strong: #96ebdf;
+    --border: #47736e;
+    --soft-border: #2e4d49;
+    --active-row: rgba(100, 211, 198, 0.16);
+    --shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
 }
 
-body.dark-mode nav ul li,
-body.dark-mode .box,
-body.dark-mode #flashcardList li,
-body.dark-mode #deckLoadList li {
-    background-color: #2a2a2a;
-    border-color: #444;
-    color: #eee;
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode button,
+body.dark-mode .file-label,
+body.dark-mode #flashcardList,
+body.dark-mode #deckLoadList,
+body.dark-mode #drawingCanvas {
+    background: #162523;
 }
 
-body.dark-mode .box button,
-body.dark-mode a,
-body.dark-mode #downloadFlashcards {
-    border-color: #66d6d0;
-    color: #66d6d0;
-}
+@media (max-width: 780px) {
+    main {
+        padding: 12px;
+    }
 
-body.dark-mode .box button:hover,
-body.dark-mode #downloadFlashcards:hover {
-    background-color: #346e6a;
-}
-
-@media (max-width: 768px) {
     .box {
         flex-direction: column;
         align-items: stretch;
     }
 
     nav ul {
-        flex-direction: column;
+        justify-content: stretch;
+        padding: 8px 12px;
     }
 
-    .box button,
-    #downloadFlashcards,
-    #uploadFlashcards,
-    #flashcardForm input {
-        min-width: 100%;
+    nav ul li {
+        width: 100%;
+        justify-content: center;
+        display: flex;
     }
 
     #drawingCanvas {
-        height: 40vh;
+        min-height: 280px;
+    }
+
+    #stats {
+        min-width: 100%;
     }
 }

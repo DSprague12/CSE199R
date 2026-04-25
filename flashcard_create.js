@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('flashcardForm');
     const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
+    const defaultDeckPaths = ['flashcards/flashcards.json', 'flashcards.json'];
 
     let fileDataUrl = null;
 
@@ -24,7 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function loadFlashcards() {
+    async function fetchDefaultDeck() {
+        for (const path of defaultDeckPaths) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) continue;
+                const data = await response.json();
+                return data.flashcards || [];
+            } catch (_) {
+                // Continue to next known path.
+            }
+        }
+        return [];
+    }
+
+    async function loadFlashcards() {
         const stored = localStorage.getItem('flashcards');
         if (stored) {
             try {
@@ -37,13 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        return fetch('flashcards.json')
-            .then(r => r.json())
-            .then(data => {
-                const cards = data.flashcards || [];
-                return cards.map(normalizeCard);
-            })
-            .catch(() => []);
+        const cards = await fetchDefaultDeck();
+        return cards.map(normalizeCard);
     }
 
     function saveFlashcards(cards) {
@@ -70,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(f);
         });
     }
+
+    if (!form) return;
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();

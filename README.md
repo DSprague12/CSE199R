@@ -6,9 +6,10 @@ This project is a lightweight browser-based Chinese character flashcard practice
 
 - Draw and practice stroke order on a responsive canvas
 - Load flashcard sets from JSON files
-- Add flashcards with optional image media
+- Add flashcards with optional image/audio media attachments
 - Local storage saves and loads user-created decks
-- Keyboard shortcuts: `n` = next card, `t` = toggle character, `c` = clear canvas
+- Keyboard shortcuts: `n` = next card, `p` = previous card, `s` = shuffle card, `t` = toggle character, `c` = clear canvas
+- Built-in study filters, review marking, and CSV/JSON import/export
 
 ## How to use
 

@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let showCharacter = false;
     let activeIndex = 0;
     let flashcards = [];
+    let downloadObjectUrl = null;
+    const defaultDeckPaths = ['flashcards/flashcards.json', 'flashcards.json'];
 
     const themeToggle = document.getElementById('themeToggle');
 
@@ -37,7 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function loadFlashcardsFromStorage() {
+    async function fetchDefaultDeck() {
+        for (const path of defaultDeckPaths) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) continue;
+                const data = await response.json();
+                return data.flashcards || data || [];
+            } catch (_) {
+                // Try the next path.
+            }
+        }
+        return [];
+    }
+
+    async function loadFlashcardsFromStorage() {
         const stored = localStorage.getItem('flashcards');
         if (stored) {
             try {
@@ -50,19 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('flashcards');
             }
         }
-        fetch('flashcards.json')
-            .then((res) => res.json())
-            .then((data) => {
-                const items = data.flashcards || [];
-                flashcards = items.map(normalizeCard);
-                if (flashcards.length && activeIndex >= flashcards.length) activeIndex = flashcards.length - 1;
-                updateUI();
-            })
-            .catch((err) => {
-                console.error('Failed to load default flashcards', err);
-                flashcards = [];
-                updateUI();
-            });
+
+        try {
+            const items = await fetchDefaultDeck();
+            flashcards = items.map(normalizeCard);
+        } catch (err) {
+            console.error('Failed to load default flashcards', err);
+            flashcards = [];
+        }
+
+        if (flashcards.length && activeIndex >= flashcards.length) activeIndex = flashcards.length - 1;
+        updateUI();
     }
 
     function saveFlashcards() {
@@ -116,19 +130,17 @@ document.addEventListener('DOMContentLoaded', () => {
             li.style.display = 'flex';
             li.style.justifyContent = 'space-between';
             li.style.alignItems = 'center';
-            li.style.padding = '6px 8px';
-            li.style.borderBottom = '1px solid #ddd';
             if (idx === activeIndex) {
-                li.style.background = 'rgba(47, 156, 149, 0.1)';
+                li.classList.add('is-active');
             }
 
             const text = document.createElement('span');
+            text.className = 'card-text';
             text.style.flex = '1';
-            text.textContent = `${card.character || '(no char)'} — ${card.pinyin || '(no pinyin)'} [${card.tags.join(', ')}]`;
+            text.textContent = `${card.character || '(no char)'} - ${card.pinyin || '(no pinyin)'} [${card.tags.join(', ')}]`;
 
             const actionGroup = document.createElement('div');
-            actionGroup.style.display = 'flex';
-            actionGroup.style.gap = '6px';
+            actionGroup.className = 'card-actions';
 
             const selectBtn = document.createElement('button');
             selectBtn.textContent = 'Select';
@@ -280,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!card) {
             pinyinDisplay.textContent = '';
             display.textContent = '';
+            const cardCount = document.getElementById('cardCount');
+            if (cardCount) cardCount.textContent = 'No cards available. Import a deck or add new cards.';
             if (mediaDisplay) {
                 mediaDisplay.src = '';
                 mediaDisplay.style.display = 'none';
@@ -321,6 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const blob = new Blob([JSON.stringify({ flashcards }, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
+                if (downloadObjectUrl) URL.revokeObjectURL(downloadObjectUrl);
+                downloadObjectUrl = url;
                 download.href = url;
                 download.download = 'flashcards.json';
             } catch (e) {
@@ -385,6 +401,15 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => hint.remove(), 2100);
     }
 
+    function applyImportedCards(cards, successMessage) {
+        flashcards = cards.map(normalizeCard);
+        activeIndex = 0;
+        showCharacter = false;
+        saveFlashcards();
+        updateUI();
+        showSnackbar(successMessage);
+    }
+
     // UI event bindings
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('searchInput').addEventListener('input', renderFlashcardList);
@@ -395,6 +420,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filterSelect').value = 'all';
         document.getElementById('tagFilter').value = '';
         renderFlashcardList();
+    });
+    document.getElementById('uploadFlashcards').addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const data = JSON.parse(reader.result);
+                const cards = Array.isArray(data) ? data : data.flashcards || [];
+                applyImportedCards(cards, 'Deck uploaded');
+            } catch (_) {
+                alert('Invalid flashcard JSON file');
+            } finally {
+                e.target.value = '';
+            }
+        };
+        reader.readAsText(f);
     });
 
     document.getElementById('saveCard').addEventListener('click', applyEditorSave);
@@ -446,13 +488,11 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = JSON.parse(reader.result);
                 const cards = Array.isArray(data) ? data : data.flashcards || [];
-                flashcards = cards.map(normalizeCard);
-                activeIndex = 0;
-                saveFlashcards();
-                updateUI();
-                showSnackbar('JSON deck imported');
+                applyImportedCards(cards, 'JSON deck imported');
             } catch (err) {
                 alert('Invalid JSON file');
+            } finally {
+                e.target.value = '';
             }
         };
         reader.readAsText(f);
@@ -481,13 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = () => {
             try {
                 const cards = parseCsvText(reader.result);
-                flashcards = cards;
-                activeIndex = 0;
-                saveFlashcards();
-                updateUI();
-                showSnackbar('CSV deck imported');
+                applyImportedCards(cards, 'CSV deck imported');
             } catch (err) {
                 alert('Invalid CSV file');
+            } finally {
+                e.target.value = '';
             }
         };
         reader.readAsText(f);
@@ -609,8 +647,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.nextCharacter = () => {
+        if (!flashcards.length) return;
         clearCanvas();
-        activeIndex = (activeIndex + 1) % Math.max(1, flashcards.length);
+        activeIndex = (activeIndex + 1) % flashcards.length;
+        showCharacter = false;
+        updateUI();
+    };
+
+    window.previousCharacter = () => {
+        if (!flashcards.length) return;
+        clearCanvas();
+        activeIndex = (activeIndex - 1 + flashcards.length) % flashcards.length;
+        showCharacter = false;
+        updateUI();
+    };
+
+    window.shuffleCharacter = () => {
+        if (!flashcards.length) return;
+        clearCanvas();
+        if (flashcards.length === 1) {
+            updateUI();
+            return;
+        }
+        let next = activeIndex;
+        while (next === activeIndex) {
+            next = Math.floor(Math.random() * flashcards.length);
+        }
+        activeIndex = next;
         showCharacter = false;
         updateUI();
     };
@@ -630,16 +693,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.clearCanvas();
                 event.preventDefault();
                 break;
+            case 'p':
+                window.previousCharacter();
+                event.preventDefault();
+                break;
+            case 's':
+                window.shuffleCharacter();
+                event.preventDefault();
+                break;
         }
     });
 
-    function init() {
+    async function init() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-        loadFlashcardsFromStorage();
+        await loadFlashcardsFromStorage();
         updateUI();
         updateTheme();
     }
 
     init();
 });
+
+

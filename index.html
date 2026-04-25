@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice</title>
+    <title>Chinese Character Practice</title>
     <link rel='stylesheet' href="universal.css">
 </head>
 <body>
@@ -12,77 +12,99 @@
     <script src="drawing.js"></script>
     <script src="browse.js"></script>
     <main>
-        <h1>Practice Drawing Characters</h1>
-        <div id="container">
-            <canvas id="drawingCanvas"></canvas>
-        </div>
-        <p id = "characterDisplay"></p>
-        <p id = "pinyinDisplay"></p>
-        <p id = "cardCount" style="font-size: 0.9rem; color: #555;"></p>
-        <div class='box'>
-            <img id="mediaDisplay" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display:none; max-width:160px; margin-top:0.5em;" alt="Card media">
-        </div>
-        <div class = 'box'>
-            <button id="clearCanvas" onclick="clearCanvas()">Clear Canvas</button>
-            <button id="toggleCharacter" onclick="toggleCharacter()">Toggle Character</button>
-            <button id="nextCharacter" onclick="nextCharacter()">Next Character</button>
-            <label for="strokeWidthRange">Stroke Width: <span id="strokeWidthValue">10</span>px</label>
-            <input type="range" id="strokeWidthRange" min="1" max="50" value="10">
-        </div>
-        <div class="box">
-            <a id="downloadFlashcards" href="flashcards/flashcards.json" download>Download Flashcard File</a>
-            <input type="file" id="uploadFlashcards" accept=".json">
-        </div>
-        <form id="flashcardForm" class="box" style="flex-wrap: wrap;">
-            <input type="text" id="newCharacter" placeholder="Enter Character" required>
-            <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition" required>
-            <input type="text" id="newTags" placeholder="Tags (comma-separated)">
-            <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="newStarred"> Starred</label>
-            <button id="addFlashcard" type="submit">Add Flashcard</button>
-        </form>
+        <section class="panel hero-panel">
+            <h1>Practice Drawing Characters</h1>
+            <p class="subtitle">Draw, review, and manage your Chinese flashcards in one place.</p>
+            <p class="shortcut-hint">Shortcuts: <code>n</code> next, <code>p</code> previous, <code>s</code> shuffle, <code>t</code> toggle character, <code>c</code> clear canvas</p>
+        </section>
 
-        <h2>Study & Edit Cards</h2>
-        <div class="box" style="justify-content: space-between; align-items: center;">
-            <input type="text" id="searchInput" placeholder="Search character or pinyin" style="flex:2; min-width: 180px;">
-            <select id="filterSelect" style="flex:1; min-width: 160px;">
-                <option value="all">All cards</option>
-                <option value="due">Due for review</option>
-                <option value="missed">Missed recently</option>
-                <option value="starred">Starred</option>
-                <option value="recent">Recently added</option>
-            </select>
-            <input type="text" id="tagFilter" placeholder="Filter by tag" style="flex:1; min-width: 130px;">
-            <button id="clearFilter">Clear</button>
-        </div>
-        <div class="box" style="flex-wrap: wrap; gap: 10px;">
-            <button id="exportJson">Export JSON</button>
-            <input type="file" id="importJson" accept="application/json" style="flex:1; min-width: 150px;">
-            <button id="exportCsv">Export CSV</button>
-            <input type="file" id="importCsv" accept=".csv" style="flex:1; min-width: 150px;">
-            <button id="themeToggle">Toggle Dark Mode</button>
-        </div>
+        <section class="panel">
+            <div id="container">
+                <canvas id="drawingCanvas"></canvas>
+                <p id="characterDisplay"></p>
+            </div>
+            <p id="pinyinDisplay"></p>
+            <p id="cardCount" class="meta-line"></p>
+            <div class="media-box">
+                <img id="mediaDisplay" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Card media preview">
+            </div>
+            <div class="box controls-row">
+                <button id="clearCanvas" type="button" onclick="clearCanvas()">Clear Canvas</button>
+                <button id="toggleCharacter" type="button" onclick="toggleCharacter()">Toggle Character</button>
+                <button id="prevCharacter" type="button" onclick="previousCharacter()">Previous</button>
+                <button id="nextCharacter" type="button" onclick="nextCharacter()">Next</button>
+                <button id="shuffleCharacter" type="button" onclick="shuffleCharacter()">Shuffle</button>
+            </div>
+            <div class="stroke-row">
+                <label for="strokeWidthRange">Stroke Width: <span id="strokeWidthValue">10</span>px</label>
+                <input type="range" id="strokeWidthRange" min="1" max="50" value="10">
+            </div>
+        </section>
 
-        <div id="reviewPanel" class="box" style="flex-wrap: wrap;">
-            <button id="markEasy">Mark Easy</button>
-            <button id="markHard">Mark Hard</button>
-            <button id="markMissed">Mark Missed</button>
-            <span id="stats" style="flex:1; min-width: 150px;"></span>
-        </div>
+        <section class="panel">
+            <h2>Deck Import/Export</h2>
+            <div class="box">
+                <a id="downloadFlashcards" href="flashcards/flashcards.json" download>Download Flashcard File</a>
+                <input type="file" id="uploadFlashcards" accept=".json">
+            </div>
+            <div class="box compact-box">
+                <button id="exportJson" type="button">Export JSON</button>
+                <input type="file" id="importJson" accept="application/json">
+                <button id="exportCsv" type="button">Export CSV</button>
+                <input type="file" id="importCsv" accept=".csv">
+                <button id="themeToggle" type="button">Toggle Dark Mode</button>
+            </div>
+        </section>
 
-        <div id="cardEditor" class="box" style="flex-wrap: wrap; border: 1px solid #2f9c95; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
-            <input type="hidden" id="editCardId">
-            <input type="text" id="editCharacter" placeholder="Edit Character" style="flex:1; min-width:130px;">
-            <input type="text" id="editPinyin" placeholder="Edit Pinyin/Definition" style="flex:2; min-width:130px;">
-            <input type="text" id="editTags" placeholder="Edit tags (comma-separated)" style="flex:1; min-width:130px;">
-            <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="editStarred"> Starred</label>
-            <button id="saveCard">Save card</button>
-            <button id="deleteCard">Delete card</button>
-        </div>
+        <section class="panel">
+            <h2>Add New Card</h2>
+            <form id="flashcardForm" class="box">
+                <input type="text" id="newCharacter" placeholder="Enter Character" required>
+                <input type="text" id="newPinyin" placeholder="Enter Pinyin and Definition" required>
+                <input type="text" id="newTags" placeholder="Tags (comma-separated)">
+                <label class="check-label"><input type="checkbox" id="newStarred"> Starred</label>
+                <label class="file-label" for="fileInput">Attach media</label>
+                <input type="file" id="fileInput" accept="image/*,audio/*">
+                <button id="addFlashcard" type="submit">Add Flashcard</button>
+            </form>
+            <img id="preview" alt="New card media preview">
+        </section>
 
-        <h3>Local deck cards</h3>
-        <ul id="flashcardList"></ul>
-        <h3>Prebuilt loadable decks</h3>
-        <ul id="deckLoadList"></ul>
+        <section class="panel">
+            <h2>Study & Edit Cards</h2>
+            <div class="box filter-row">
+                <input type="text" id="searchInput" placeholder="Search character or pinyin">
+                <select id="filterSelect">
+                    <option value="all">All cards</option>
+                    <option value="due">Due for review</option>
+                    <option value="missed">Missed recently</option>
+                    <option value="starred">Starred</option>
+                    <option value="recent">Recently added</option>
+                </select>
+                <input type="text" id="tagFilter" placeholder="Filter by tag">
+                <button id="clearFilter" type="button">Clear</button>
+            </div>
+            <div id="reviewPanel" class="box compact-box">
+                <button id="markEasy" type="button">Mark Easy</button>
+                <button id="markHard" type="button">Mark Hard</button>
+                <button id="markMissed" type="button">Mark Missed</button>
+                <span id="stats"></span>
+            </div>
+            <div id="cardEditor" class="box editor-row">
+                <input type="hidden" id="editCardId">
+                <input type="text" id="editCharacter" placeholder="Edit Character">
+                <input type="text" id="editPinyin" placeholder="Edit Pinyin/Definition">
+                <input type="text" id="editTags" placeholder="Edit tags (comma-separated)">
+                <label class="check-label"><input type="checkbox" id="editStarred"> Starred</label>
+                <button id="saveCard" type="button">Save card</button>
+                <button id="deleteCard" type="button">Delete card</button>
+            </div>
+
+            <h3>Local deck cards</h3>
+            <ul id="flashcardList"></ul>
+            <h3>Prebuilt loadable decks</h3>
+            <ul id="deckLoadList"></ul>
+        </section>
     </main>
 </body>
 </html>
